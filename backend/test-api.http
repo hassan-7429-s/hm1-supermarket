@@ -1,0 +1,134 @@
+### ====================================
+### H AND M SUPERMARKET API TESTS
+### ====================================
+
+### 1. Check server status
+GET http://localhost:5000/
+
+### ====================================
+### AUTHENTICATION
+### ====================================
+
+### 2. Register a new user
+# @name register
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Hassan Sharif",
+    "email": "hassan@example.com",
+    "password": "123456"
+}
+
+### 3. Login
+# @name login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "hassan@example.com",
+    "password": "123456"
+}
+
+### Save token for later requests
+@token = {{login.response.body.token}}
+
+### 4. Get user profile (requires token)
+GET http://localhost:5000/api/auth/profile
+Authorization: Bearer {{token}}
+
+### 5. Update user profile
+PUT http://localhost:5000/api/auth/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Hassan Sharif Ahmed",
+    "address": [{
+        "street": "KG 123 St",
+        "city": "Kigali",
+        "phone": "+250788123456"
+    }]
+}
+
+### ====================================
+### PRODUCTS
+### ====================================
+
+### 6. Get all products
+GET http://localhost:5000/api/products
+
+### 7. Get products with filters
+GET http://localhost:5000/api/products?category=Fruits&featured=true&sort=price-asc&page=1&limit=5
+
+### 8. Search products
+GET http://localhost:5000/api/products?search=apple
+
+### 9. Create a new product (admin only - you need to be admin)
+POST http://localhost:5000/api/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Fresh Apples",
+    "description": "Crisp and sweet apples from local farms",
+    "price": 3000,
+    "category": "Fruits",
+    "image": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6",
+    "stock": 50,
+    "unit": "kg",
+    "featured": true,
+    "discount": 0
+}
+
+### ====================================
+### ORDERS
+### ====================================
+
+### 10. Create an order (requires token)
+POST http://localhost:5000/api/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "orderItems": [
+        {
+            "product": "PRODUCT_ID_HERE",
+            "quantity": 2
+        }
+    ],
+    "shippingAddress": {
+        "street": "KG 123 St",
+        "city": "Kigali",
+        "phone": "+250788123456"
+    },
+    "paymentMethod": "stripe"
+}
+
+### 11. Get user's orders
+GET http://localhost:5000/api/orders/myorders
+Authorization: Bearer {{token}}
+
+### ====================================
+### PAYMENTS
+### ====================================
+
+### 12. Create payment intent (requires token)
+POST http://localhost:5000/api/payments/create-payment-intent
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "items": [
+        {
+            "_id": "PRODUCT_ID_HERE",
+            "price": 3000,
+            "quantity": 2
+        }
+    ],
+    "shippingAddress": {
+        "street": "KG 123 St",
+        "city": "Kigali",
+        "phone": "+250788123456"
+    }
+}
